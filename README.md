@@ -37,10 +37,10 @@ pandas
 
 본 모델은 COCO dataset을 바탕으로 pre-train된 모델을 전이학습시켰습니다.
 
-![README%20md%20d8a88002a03d424f85993afd424ebc3b/result.png](README%20md%20d8a88002a03d424f85993afd424ebc3b/result.png)
+![README%20md/result.png](README%20md/result.png)
 
 추후 모델개선에 있어서, 필요한 이미지는 클래스당 1500개, 클래스의 인스턴스가 10000개가 될 수 있도록 조정할 예정입니다.
 
 또한 초기모델의 경우 가장 리소스를 많이 사용하는 YOLOv5x를 사용했습니다. 추후 프로그램에 환경에 따라 모델의 크기를 m이나 l로 조정할 수 있습니다.
 
-![README%20md%20d8a88002a03d424f85993afd424ebc3b/testgif.gif](README%20md%20d8a88002a03d424f85993afd424ebc3b/testgif.gif)
+![README%20md/testgif.gif](README%20md/testgif.gif)
