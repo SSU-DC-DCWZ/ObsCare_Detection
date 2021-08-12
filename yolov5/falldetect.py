@@ -87,7 +87,7 @@ class model:
     
         for path, img, im0s, vid_cap in self.dataset:
 
-            pred = runInference(path, img)
+            pred = self.runInference(path, img)
 #
             ######################################################
             #img = torch.from_numpy(img).to(self.device)
@@ -109,7 +109,7 @@ class model:
             # Process detections
 #
             for i, det in enumerate(pred):  # detections per image
-                detection(i, det, path, img, im0s)
+                self.detection(i, det, path, img, im0s)
 #
                 #if self.webcam:  # batch_size >= 1
                 #    p, s, im0, frame = path[i], f'{i}: ', im0s[i].copy(), self.dataset.count
@@ -150,69 +150,68 @@ class model:
 #
                 # Print time (inference + NMS)
                 if self.c >= 1:
-                    writeLog(self.s)
+                    self.writeLog(self.s)
                     #print(f'{s}Done. ({t2 - t1:.3f}s)')
 
                 # Stream results
                 if self.view_img:
-                    loadVideo(str(self.p), self.im0)
+                    self.loadVideo(str(self.p), self.im0)
                     #cv2.imshow(str(p), im0)
                     #cv2.waitKey(1)  # 1 millisecond
 
 
-def writeLog(name):
-    print(f'time, camNum, {name}')
+    def writeLog(self, name):
+        print(f'time, camNum, {name}')
 
-def loadVideo(path, image):
-    cv2.imshow(path, image)
-    cv2.waitKey(1)  # 1 millisecond
+    def loadVideo(slef, path, image):
+        cv2.imshow(path, image)
+        cv2.waitKey(1)  # 1 millisecond
 
-def runInference(self, path, img):
+    def runInference(self, path, img):
 
-        img = torch.from_numpy(img).to(self.device)
-        img = img.half() if self.half else img.float()  # uint8 to fp16/32
-        img /= 255.0  # 0 - 255 to 0.0 - 1.0
-        if img.ndimension() == 3:
-            img = img.unsqueeze(0)
-        # Inference
-        t1 = time_sync()
-        pred = self.model(img,
-                     augment=self.augment,
-                     visualize=increment_path(self.save_dir / Path(path).stem, mkdir=True) if self.visualize else False)[0]
-        # Apply NMS
-        pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, self.classes, self.agnostic_nms, max_det=self.max_det)
-        t2 = time_sync()
-        return pred
+            img = torch.from_numpy(img).to(self.device)
+            img = img.half() if self.half else img.float()  # uint8 to fp16/32
+            img /= 255.0  # 0 - 255 to 0.0 - 1.0
+            if img.ndimension() == 3:
+                img = img.unsqueeze(0)
+            # Inference
+            t1 = time_sync()
+            pred = self.model(img,
+                         augment=self.augment,
+                         visualize=increment_path(self.save_dir / Path(path).stem, mkdir=True) if self.visualize else False)[0]
+            # Apply NMS
+            pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, self.classes, self.agnostic_nms, max_det=self.max_det)
+            t2 = time_sync()
+            return pred
 
-def detection(self, i, det, path, img, im0s):
-    if self.webcam:  # batch_size >= 1
-        p, self.s, self.im0, frame = path[i], f'{i}: ', im0s[i].copy(), self.dataset.count
+    def detection(self, i, det, path, img, im0s):
+        if self.webcam:  # batch_size >= 1
+            p, self.s, self.im0, frame = path[i], f'{i}: ', im0s[i].copy(), self.dataset.count
 
-    self.p = Path(p)  # to Path
-    #save_path = str(self.save_dir / p.name)  # img.jpg
-    txt_path = str(self.save_dir / 'labels' / p.stem) + ('' if self.dataset.mode == 'image' else f'_{frame}')  # img.txt
-    self.s += '%gx%g ' % img.shape[2:]  # print string
-    self.c = 0
-    gn = torch.tensor(self.im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
-    
-    #############################################
-    if len(det):
-        # Rescale boxes from img_size to im0 size
-        det[:, :4] = scale_coords(img.shape[2:], det[:, :4], self.im0.shape).round  
-        # Print results
-        for c in det[:, -1].unique():
-            n = (det[:, -1] == c).sum()  # detections per class
-            self.s += f"{n} {self.names[int(c)]}{'s' * (n > 1)}, "  # add to stri   
-        # Write results
-        for *xyxy, conf, cls in reversed(det):
-            if self.save_txt:  # Write to file
-                xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                line = (cls, *xywh, conf) if self.save_conf else (cls, *xywh)  # label format
-                with open(txt_path + '.txt', 'a') as f:
-                     f.write(('%g ' * len(line)).rstrip() % line + '\n')
+        self.p = Path(p)  # to Path
+        #save_path = str(self.save_dir / p.name)  # img.jpg
+        txt_path = str(self.save_dir / 'labels' / self.p.stem) + ('' if self.dataset.mode == 'image' else f'_{frame}')  # img.txt
+        self.s += '%gx%g ' % img.shape[2:]  # print string
+        self.c = 0
+        gn = torch.tensor(self.im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
 
-            if self.save_img or self.save_crop or self.view_img:  # Add bbox to image
-                c = int(cls)  # integer class
-                label = None if self.hide_labels else (self.names[c] if self.hide_conf else f'{self.names[c]} {conf:.2f}')
-                plot_one_box(xyxy, self.im0, label=label, color=colors(c, True), line_thickness=self.line_thickness)
-                
+        #############################################
+        if len(det):
+            # Rescale boxes from img_size to im0 size
+            det[:, :4] = scale_coords(img.shape[2:], det[:, :4], self.im0.shape).round()
+            # Print results
+            for c in det[:, -1].unique():
+                n = (det[:, -1] == c).sum()  # detections per class
+                self.s += f"{n} {self.names[int(c)]}{'s' * (n > 1)}, "  # add to stri   
+            # Write results
+            for *xyxy, conf, cls in reversed(det):
+                if self.save_txt:  # Write to file
+                    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
+                    line = (cls, *xywh, conf) if self.save_conf else (cls, *xywh)  # label format
+                    with open(txt_path + '.txt', 'a') as f:
+                         f.write(('%g ' * len(line)).rstrip() % line + '\n')
+
+                if self.save_img or self.save_crop or self.view_img:  # Add bbox to image
+                    c = int(cls)  # integer class
+                    label = None if self.hide_labels else (self.names[c] if self.hide_conf else f'{self.names[c]} {conf:.2f}')
+                    plot_one_box(xyxy, self.im0, label=label, color=colors(c, True), line_thickness=self.line_thickness)
