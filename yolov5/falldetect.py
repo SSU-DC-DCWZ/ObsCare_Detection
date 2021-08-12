@@ -8,6 +8,7 @@ Usage:
 import argparse
 import sys
 import time
+import datetime
 from pathlib import Path
 
 import cv2
@@ -107,6 +108,10 @@ class model:
         print(f'time, camNum, {name}')
 
     def loadVideo(self, path, image):
+        showtime = datetime.datetime.now()
+        cv2.putText(image, showtime.strftime('%Y/%m/%d'), (10,470), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
+        cv2.putText(image, showtime.strftime('%H:%M:%S'), (555,470), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
+        cv2.putText(image, 'CAM' + str(0), (575,25), cv2.FONT_HERSHEY_DUPLEX,0.7,(255,255,255)) #스트리밍 화면에 시간, 카메라번호 출력
         cv2.imshow(path, image)
         if cv2.waitKey(1) == 27:
             self.running = False
