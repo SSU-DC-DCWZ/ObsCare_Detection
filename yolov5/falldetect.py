@@ -102,7 +102,7 @@ class model:
 
     def stop(self):
         self.running = False
-        #self.vid_cap.release()
+        self.out.release()
 
     def run(self):
         # Run inference
@@ -110,7 +110,7 @@ class model:
             self.model(torch.zeros(1, 3, self.imgsz, self.imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
         t0 = time.time()
         self.running = True
-        for path, img, im0s, self.vid_cap in self.dataset:
+        for path, img, im0s, vid_cap in self.dataset:
             if self.running == False:
                 self.stop()
                 break
@@ -128,7 +128,7 @@ class model:
                     self.loadVideo(str(self.p), self.im0)
 
             now = datetime.datetime.now()
-            if now.strftime('%H%M%S') == '203500':  # 일단위 저장을 위해 00시 00분 00초가 되면 스트리밍을 멈추고 재시작
+            if now.strftime('%H%M%S') == '205930':  # 일단위 저장을 위해 00시 00분 00초가 되면 스트리밍을 멈추고 재시작
                 self.stop()
                 self.start()
 
