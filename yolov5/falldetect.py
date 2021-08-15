@@ -26,9 +26,9 @@ from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_sync
 
 class model:
-    def __init__(self, classes):
+    def __init__(self, classes, camNum):
         self.weights = '../best.pt'
-        self.source = '0'
+        self.source = str(camNum) # 요구사항 1 수정
         self.imgsz = 640
         self.conf_thres = 0.25
         self.iou_thres = 0.45
@@ -66,22 +66,22 @@ class model:
         # Initialize
         set_logging()
         self.device = select_device(self.device)
-        self.half &= self.device.type != 'cpu'  # half precision only supported on CUDA
         # Load model
         self.model = attempt_load(self.weights, map_location=self.device)  # load FP32 model
         self.stride = int(self.model.stride.max())  # model stride
         self.imgsz = check_img_size(self.imgsz, s=self.stride)  # check image size
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names  # get class names
         self.classify = False
+
         # Dataloader
+    
+    #요구사항2 수정
+    def loadCam(self):
         if self.webcam:
             self.view_img = check_imshow()
             cudnn.benchmark = True  # set True to speed up constant image size inference
             self.dataset = LoadStreams(self.source, img_size=self.imgsz, stride=self.stride)
-            bs = len(self.dataset)  # batch_size
-        vid_path, vid_writer = [None] * bs, [None] * bs
       
-    
     def run(self):
         # Run inference
         if self.device.type != 'cpu':
