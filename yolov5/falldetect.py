@@ -10,6 +10,8 @@ import sys
 import time
 import datetime
 from pathlib import Path
+import os
+import errno
 
 import cv2
 import torch
@@ -19,7 +21,7 @@ FILE = Path(__file__).absolute()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
 from models.experimental import attempt_load
-from utils.datasets import LoadStreams, LoadImages
+from utils.datasets import LoadStreams
 from utils.general import check_img_size, check_requirements, check_imshow, colorstr, non_max_suppression, \
     apply_classifier, scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path, save_one_box
 from utils.plots import colors, plot_one_box
@@ -53,6 +55,7 @@ class model:
         self.half=False
 
         self.running = False
+        self.loadModel()
 
     @torch.no_grad()
 
@@ -76,20 +79,40 @@ class model:
         # Dataloader
     
     #요구사항2 수정
-    def loadCam(self):
+    def start(self):
         if self.webcam:
             self.view_img = check_imshow()
             cudnn.benchmark = True  # set True to speed up constant image size inference
             self.dataset = LoadStreams(self.source, img_size=self.imgsz, stride=self.stride)
-      
+        width = self.dataset.w
+        height = self.dataset.h
+        now = datetime.datetime.now()
+        self.savename = "./data/Recording/" + self.source + "/" + now.strftime('%Y%m%d%H%M%S') + ".mp4"
+        try:  # 파일 경로 생성, 경로가 존재 하지 않을 경우 파일 경로 생성
+            if not (os.path.isdir("./data/Recording/" + self.source)):
+                os.makedirs(os.path.join("./data/Recording/" + self.source))
+                print("./data/Recording/0")
+        except OSError as e:  # 생성 실패 시 오류 코드 출력
+            if e.errno != errno.EEXIST:
+                print("Dir error")
+            raise
+        codec = cv2.VideoWriter_fourcc(*'mp4v')
+        self.out = cv2.VideoWriter(self.savename, codec, 20.0, ((int(width)), (int(height))))
+        self.run()
+
+    def stop(self):
+        self.running = False
+        #self.vid_cap.release()
+
     def run(self):
         # Run inference
         if self.device.type != 'cpu':
             self.model(torch.zeros(1, 3, self.imgsz, self.imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
         t0 = time.time()
         self.running = True
-        for path, img, im0s, vid_cap in self.dataset:
+        for path, img, im0s, self.vid_cap in self.dataset:
             if self.running == False:
+                self.stop()
                 break
             pred = self.runInference(path, img)
 #
@@ -104,6 +127,11 @@ class model:
                 if self.view_img:
                     self.loadVideo(str(self.p), self.im0)
 
+            now = datetime.datetime.now()
+            if now.strftime('%H%M%S') == '203500':  # 일단위 저장을 위해 00시 00분 00초가 되면 스트리밍을 멈추고 재시작
+                self.stop()
+                self.start()
+
     def writeLog(self, name):
         print(f'time, camNum, {name}')
 
@@ -113,6 +141,7 @@ class model:
         cv2.putText(image, showtime.strftime('%H:%M:%S'), (555,470), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
         cv2.putText(image, 'CAM' + str(0), (575,25), cv2.FONT_HERSHEY_DUPLEX,0.7,(255,255,255)) #스트리밍 화면에 시간, 카메라번호 출력
         cv2.imshow(path, image)
+        self.out.write(image)
         if cv2.waitKey(1) == 27:
             self.running = False
 
