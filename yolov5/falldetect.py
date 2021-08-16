@@ -32,7 +32,7 @@ class model:
         self.weights = '../best.pt'
         self.source = str(camNum) # 요구사항 1 수정
         self.imgsz = 640
-        self.conf_thres = 0.25
+        self.conf_thres = 0.45
         self.iou_thres = 0.45
         self.max_det=1000  # maximum detections per image
         self.device=''  # cuda device, i.e. 0 or 0,1,2,3 or cpu
