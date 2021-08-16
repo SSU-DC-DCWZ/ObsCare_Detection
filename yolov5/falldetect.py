@@ -86,18 +86,18 @@ class model:
             self.dataset = LoadStreams(self.source, img_size=self.imgsz, stride=self.stride)
         width = self.dataset.w
         height = self.dataset.h
+        fps = self.dataset.fps[0]
         now = datetime.datetime.now()
         self.savename = "./data/Recording/" + self.source + "/" + now.strftime('%Y%m%d%H%M%S') + ".mp4"
         try:  # 파일 경로 생성, 경로가 존재 하지 않을 경우 파일 경로 생성
             if not (os.path.isdir("./data/Recording/" + self.source)):
                 os.makedirs(os.path.join("./data/Recording/" + self.source))
-                print("./data/Recording/0")
         except OSError as e:  # 생성 실패 시 오류 코드 출력
             if e.errno != errno.EEXIST:
                 print("Dir error")
             raise
         codec = cv2.VideoWriter_fourcc(*'mp4v')
-        self.out = cv2.VideoWriter(self.savename, codec, 20.0, ((int(width)), (int(height))))
+        self.out = cv2.VideoWriter(self.savename, codec, fps, ((int(width)), (int(height))))
         self.run()
 
     def stop(self):
@@ -146,20 +146,20 @@ class model:
             self.running = False
 
     def runInference(self, path, img):
-            img = torch.from_numpy(img).to(self.device)
-            img = img.half() if self.half else img.float()  # uint8 to fp16/32
-            img /= 255.0  # 0 - 255 to 0.0 - 1.0
-            if img.ndimension() == 3:
-                img = img.unsqueeze(0)
-            # Inference
-            t1 = time_sync()
-            pred = self.model(img,
-                         augment=self.augment,
-                         visualize=increment_path(self.save_dir / Path(path).stem, mkdir=True) if self.visualize else False)[0]
-            # Apply NMS
-            pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, self.classes, self.agnostic_nms, max_det=self.max_det)
-            t2 = time_sync()
-            return pred
+        img = torch.from_numpy(img).to(self.device)
+        img = img.half() if self.half else img.float()  # uint8 to fp16/32
+        img /= 255.0  # 0 - 255 to 0.0 - 1.0
+        if img.ndimension() == 3:
+            img = img.unsqueeze(0)
+        # Inference
+        t1 = time_sync()
+        pred = self.model(img,
+                     augment=self.augment,
+                     visualize=increment_path(self.save_dir / Path(path).stem, mkdir=True) if self.visualize else False)[0]
+        # Apply NMS
+        pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, self.classes, self.agnostic_nms, max_det=self.max_det)
+        t2 = time_sync()
+        return pred
 
     def detection(self, i, det, path, img, im0s):
         if self.webcam:  # batch_size >= 1
