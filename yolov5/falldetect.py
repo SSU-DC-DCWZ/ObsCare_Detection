@@ -53,7 +53,6 @@ class model:
         self.hide_labels=False  # hide labels
         self.hide_conf=False  # hide confidences
         self.half=False
-
         self.running = False
         self.loadModel()
 
@@ -86,6 +85,7 @@ class model:
             self.dataset = LoadStreams(self.source, img_size=self.imgsz, stride=self.stride)
         width = self.dataset.w
         height = self.dataset.h
+        fps = self.dataset.fps[0]
         now = datetime.datetime.now()
         self.savename = "./data/Recording/" + self.source + "/" + now.strftime('%Y%m%d%H%M%S') + ".mp4"
         try:  # 파일 경로 생성, 경로가 존재 하지 않을 경우 파일 경로 생성
@@ -97,7 +97,7 @@ class model:
                 print("Dir error")
             raise
         codec = cv2.VideoWriter_fourcc(*'mp4v')
-        self.out = cv2.VideoWriter(self.savename, codec, 20.0, ((int(width)), (int(height))))
+        self.out = cv2.VideoWriter(self.savename, codec, fps, ((int(width)), (int(height))))
         self.run()
 
     def stop(self):
