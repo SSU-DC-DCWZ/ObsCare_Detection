@@ -53,7 +53,6 @@ class model:
         self.hide_labels=False  # hide labels
         self.hide_conf=False  # hide confidences
         self.half=False
-
         self.running = False
         self.loadModel()
 
