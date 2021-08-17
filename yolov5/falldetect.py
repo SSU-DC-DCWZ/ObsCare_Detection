@@ -1,11 +1,4 @@
-"""Run inference with a YOLOv5 model on images, videos, directories, streams
-
-Usage:
-    $ python path/to/detect.py --source path/to/img.jpg --weights yolov5s.pt --img 640
-"""
- 
 #from _typeshed import Self
-import argparse
 import sys
 import time
 import datetime
@@ -24,15 +17,14 @@ sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
 from models.experimental import attempt_load
 from utils.datasets import LoadStreams
-from utils.general import check_img_size, check_requirements, check_imshow, colorstr, non_max_suppression, \
-    apply_classifier, scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path, save_one_box
+from utils.general import check_img_size, check_imshow,non_max_suppression, scale_coords, xyxy2xywh,set_logging, increment_path
 from utils.plots import colors, plot_one_box
-from utils.torch_utils import select_device, load_classifier, time_sync
+from utils.torch_utils import select_device,time_sync
 
 class model:
     def __init__(self, classes, camNum):
         self.weights = '../best.pt'
-        self.source = str(camNum) # 요구사항 1 수정
+        self.source = str(camNum) # 
         self.imgsz = 640
         self.conf_thres = 0.45
         self.iou_thres = 0.45
@@ -77,7 +69,6 @@ class model:
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names  # get class names
         self.classify = False
 
-        # Dataloader
     
     #요구사항2 수정
     def start(self):
