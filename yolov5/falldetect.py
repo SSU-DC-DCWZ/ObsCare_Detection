@@ -57,7 +57,6 @@ class model:
         self.half=False
         self.running = False
         self.loadModel()
-        self.sign = 0  # 스크린샷이 필요한 상황 발생 시 상황별 번호(0:상황 없음, 1:환자발생, 1~4:도움이 필요한사람)
 
     @torch.no_grad()
 
@@ -121,18 +120,22 @@ class model:
                 self.stop()
                 break
             pred = self.runInference(path, img)
-#
+
             for i, det in enumerate(pred):  # detections per image
                 self.detection(i, det, path, img, im0s)
-#
+                showtime = datetime.datetime.now()
+                cv2.putText(self.im0, showtime.strftime('%Y/%m/%d'), (10,470), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
+                cv2.putText(self.im0, showtime.strftime('%H:%M:%S'), (555,470), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
+                cv2.putText(self.im0, 'CAM' + str(0), (575,25), cv2.FONT_HERSHEY_DUPLEX,0.7,(255,255,255)) #스트리밍 화면에 시간, 카메라번호 출력
+
                 # Print time (inference + NMS)
                 if self.c >= 1:
                     self.writeLog(self.s)
-                    self.screenshot(self.im0)
+                    self.screenshot(self.c)
 
                 # Stream results
                 if self.view_img:
-                    self.loadVideo(str(self.p), self.im0)
+                    self.loadVideo(str(self.p))
 
             now = datetime.datetime.now()
             if now.strftime('%H%M%S') == '000000':  # 일단위 저장을 위해 00시 00분 00초가 되면 스트리밍을 멈추고 재시작
@@ -142,32 +145,26 @@ class model:
     def writeLog(self, name):
         print(f'time, camNum, {name}')
 
-    def loadVideo(self, path, image):
-        showtime = datetime.datetime.now()
-        cv2.putText(image, showtime.strftime('%Y/%m/%d'), (10,470), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
-        cv2.putText(image, showtime.strftime('%H:%M:%S'), (555,470), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
-        cv2.putText(image, 'CAM' + str(0), (575,25), cv2.FONT_HERSHEY_DUPLEX,0.7,(255,255,255)) #스트리밍 화면에 시간, 카메라번호 출력
-        cv2.imshow(path, image)
-        self.out.write(image)
+    def loadVideo(self, path):
+        cv2.imshow(path, self.im0)
+        self.out.write(self.im0)
         if cv2.waitKey(1) == 27:
             self.running = False
 
-    def screenshot(self, image):
+    def screenshot(self, situation):
         now = datetime.datetime.now()
-        name = './data/Situation/' + str(self.sign) + '/' + now.strftime('%Y%m%d%H%M%S_' + str(self.sign)) + '.jpg'
+        name = './data/Situation/' + str(situation) + '/' + now.strftime('%Y%m%d%H%M%S_' + str(situation)) + '.jpg'
         try:  # 파일 경로 생성, 경로가 존재 하지 않을 경우 파일 경로 생성
-            if not (os.path.isdir("./data/Situation/" + str(self.sign))):
-                os.makedirs(os.path.join("./data/Situation/" + str(self.sign)))
+            if not (os.path.isdir("./data/Situation/" + str(situation))):
+                os.makedirs(os.path.join("./data/Situation/" + str(situation)))
         except OSError as e:  # 생성 실패 시 오류 코드 출력
             if e.errno != errno.EEXIST:
                 print("Dir error")
             raise
-
-        cv2.imwrite(name, image)
-        im = logDB.DBlog(self.sign, now, name)
+        cv2.imwrite(name, self.im0)
+        im = logDB.DBlog(situation, now, name)
         im.makerecord(self.source)
         del im
-        self.sign = 0
 
     def runInference(self, path, img):
         img = torch.from_numpy(img).to(self.device)
@@ -211,6 +208,6 @@ class model:
                          f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                 if self.save_img or self.save_crop or self.view_img:  # Add bbox to image
-                    c = int(cls)  # integer class
-                    label = None if self.hide_labels else (self.names[c] if self.hide_conf else f'{self.names[c]} {conf:.2f}')
-                    plot_one_box(xyxy, self.im0, label=label, color=colors(c, True), line_thickness=self.line_thickness)
+                    self.c = int(cls)  # integer class
+                    label = None if self.hide_labels else (self.names[self.c] if self.hide_conf else f'{self.names[self.c]} {conf:.2f}')
+                    plot_one_box(xyxy, self.im0, label=label, color=colors(self.c, True), line_thickness=self.line_thickness)
