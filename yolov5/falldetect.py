@@ -16,6 +16,8 @@ import errno
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
+from DB_video import videoDB
+from DB_log import logDB
 
 FILE = Path(__file__).absolute()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
@@ -55,6 +57,7 @@ class model:
         self.half=False
         self.running = False
         self.loadModel()
+        self.sign = 0  # 스크린샷이 필요한 상황 발생 시 상황별 번호(0:상황 없음, 1:환자발생, 1~4:도움이 필요한사람)
 
     @torch.no_grad()
 
@@ -87,6 +90,7 @@ class model:
         height = self.dataset.h
         fps = self.dataset.fps[0]
         now = datetime.datetime.now()
+        self.starttime = datetime.datetime.now()
         self.savename = "./data/Recording/" + self.source + "/" + now.strftime('%Y%m%d%H%M%S') + ".mp4"
         try:  # 파일 경로 생성, 경로가 존재 하지 않을 경우 파일 경로 생성
             if not (os.path.isdir("./data/Recording/" + self.source)):
@@ -102,6 +106,9 @@ class model:
     def stop(self):
         self.running = False
         self.out.release()
+        db = videoDB.DBvideo(self.source, self.starttime, self.savename)
+        db.makerecord()
+        del db
 
     def run(self):
         # Run inference
@@ -121,13 +128,14 @@ class model:
                 # Print time (inference + NMS)
                 if self.c >= 1:
                     self.writeLog(self.s)
+                    self.screenshot(self.im0)
 
                 # Stream results
                 if self.view_img:
                     self.loadVideo(str(self.p), self.im0)
 
             now = datetime.datetime.now()
-            if now.strftime('%H%M%S') == '205930':  # 일단위 저장을 위해 00시 00분 00초가 되면 스트리밍을 멈추고 재시작
+            if now.strftime('%H%M%S') == '000000':  # 일단위 저장을 위해 00시 00분 00초가 되면 스트리밍을 멈추고 재시작
                 self.stop()
                 self.start()
 
@@ -143,6 +151,23 @@ class model:
         self.out.write(image)
         if cv2.waitKey(1) == 27:
             self.running = False
+
+    def screenshot(self, image):
+        now = datetime.datetime.now()
+        name = './data/Situation/' + str(self.sign) + '/' + now.strftime('%Y%m%d%H%M%S_' + str(self.sign)) + '.jpg'
+        try:  # 파일 경로 생성, 경로가 존재 하지 않을 경우 파일 경로 생성
+            if not (os.path.isdir("./data/Situation/" + str(self.sign))):
+                os.makedirs(os.path.join("./data/Situation/" + str(self.sign)))
+        except OSError as e:  # 생성 실패 시 오류 코드 출력
+            if e.errno != errno.EEXIST:
+                print("Dir error")
+            raise
+
+        cv2.imwrite(name, image)
+        im = logDB.DBlog(self.sign, now, name)
+        im.makerecord(self.source)
+        del im
+        self.sign = 0
 
     def runInference(self, path, img):
         img = torch.from_numpy(img).to(self.device)
