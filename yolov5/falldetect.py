@@ -153,7 +153,7 @@ class model:
 
     def screenshot(self, situation):
         now = datetime.datetime.now()
-        name = './data/Situation/' + str(situation) + '/' + now.strftime('%Y%m%d%H%M%S_' + str(situation)) + '.jpg'
+        path = './data/Situation/' + str(situation) + '/' + now.strftime('%Y%m%d%H%M%S_' + str(situation)) + '.jpg'
         try:  # 파일 경로 생성, 경로가 존재 하지 않을 경우 파일 경로 생성
             if not (os.path.isdir("./data/Situation/" + str(situation))):
                 os.makedirs(os.path.join("./data/Situation/" + str(situation)))
@@ -161,9 +161,9 @@ class model:
             if e.errno != errno.EEXIST:
                 print("Dir error")
             raise
-        cv2.imwrite(name, self.im0)
-        im = logDB.DBlog(situation, now, name)
-        im.makerecord(self.source)
+        cv2.imwrite(path, self.im0)
+        im = logDB.DBlog(now, situation, self.source, path)
+        im.makerecord()
         del im
 
     def runInference(self, path, img):
