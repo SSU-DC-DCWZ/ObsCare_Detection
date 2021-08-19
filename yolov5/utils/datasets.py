@@ -14,7 +14,6 @@ from pathlib import Path
 from threading import Thread
 
 import cv2
-import imutils
 import numpy as np
 import torch
 import torch.nn.functional as F

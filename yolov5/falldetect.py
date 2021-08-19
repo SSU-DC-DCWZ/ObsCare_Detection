@@ -78,7 +78,6 @@ class model:
             self.dataset = LoadStreams(self.source, img_size=self.imgsz, stride=self.stride)
         width = self.dataset.w
         height = self.dataset.h
-        print(width, height)
         fps = self.dataset.fps[0]
         now = datetime.datetime.now()
         self.starttime = datetime.datetime.now()
@@ -121,7 +120,7 @@ class model:
                 cv2.putText(self.im0, 'CAM' + str(0), (1200,25), cv2.FONT_HERSHEY_DUPLEX,0.7,(255,255,255)) #스트리밍 화면에 시간, 카메라번호 출력
 
                 # Print time (inference + NMS)
-                if self.c >= 0:
+                if self.c >= 1:
                     self.writeLog(self.s)
                     self.screenshot(self.c)
 
