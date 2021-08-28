@@ -58,12 +58,8 @@ class model:
     @torch.no_grad()
 
     def loadModel(self):
-        self.save_img = not self.nosave and not self.source.endswith('.txt')  # save inference images
         self.webcam = self.source.isnumeric() or self.source.endswith('.txt') or self.source.lower().startswith(
             ('rtsp://', 'rtmp://', 'http://', 'https://'))
-        # Directories
-        self.save_dir = increment_path(Path(self.project) / self.name, exist_ok= False)  # increment run
-        (self.save_dir / 'labels' if self.save_txt else self.save_dir).mkdir(parents=True, exist_ok=True)  # make dir
         # Initialize
         set_logging()
         self.device = select_device(self.device)
@@ -109,7 +105,6 @@ class model:
         # Run inference
         if self.device.type != 'cpu':
             self.model(torch.zeros(1, 3, self.imgsz, self.imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
-        t0 = time.time()
         self.running = True
         for path, img, im0s, vid_cap in self.dataset:
             if self.running == False:
@@ -147,12 +142,15 @@ class model:
         if len(self.list) >= 2 :
             time = (self.list[-1] - self.list[0])
             print(time.total_seconds())
+
         else:
-            self.list = []
+            time = 0
+            #self.list = [] ?? 이게뭘까
       
-        if time.total_seconds() >= 5:
+        if time.total_seconds() == 5: ##연속적 falldetect
             print("fall is detected")
-            self.list = []
+            self.list = [] ## 시간 초기화
+
             
         
 
@@ -187,13 +185,11 @@ class model:
         if img.ndimension() == 3:
             img = img.unsqueeze(0)
         # Inference
-        t1 = time_sync()
         pred = self.model(img,
                      augment=self.augment,
                      visualize=increment_path(self.save_dir / Path(path).stem, mkdir=True) if self.visualize else False)[0]
         # Apply NMS
         pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, self.classes, self.agnostic_nms, max_det=self.max_det)
-        t2 = time_sync()
         return pred
 
     def detection(self, i, det, path, img, im0s):
@@ -201,11 +197,8 @@ class model:
             p, self.s, self.im0, frame = path[i], f'{i}: ', im0s[i].copy(), self.dataset.count
 
         self.p = Path(p)  # to Path
-        #save_path = str(self.save_dir / p.name)  # img.jpg
-        txt_path = str(self.save_dir / 'labels' / self.p.stem) + ('' if self.dataset.mode == 'image' else f'_{frame}')  # img.txt
         self.s += '%gx%g ' % img.shape[2:]  # print string
         self.c = 0
-        gn = torch.tensor(self.im0.shape)[[1, 0, 1, 0]]  # normalization gain whwh
         if len(det):
             # Rescale boxes from img_size to im0 size
             det[:, :4] = scale_coords(img.shape[2:], det[:, :4], self.im0.shape).round()
@@ -215,12 +208,6 @@ class model:
                 self.s += f"{n} {self.names[int(self.c)]}{'s' * (n > 1)}, "  # add to stri   
             # Write results
             for *xyxy, conf, cls in reversed(det):
-                #if self.save_txt:  # Write to file
-                #    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                #    line = (cls, *xywh, conf) if self.save_conf else (cls, *xywh)  # label format
-                #    with open(txt_path + '.txt', 'a') as f:
-                #         f.write(('%g ' * len(line)).rstrip() % line + '\n')
-
                 if self.save_img or self.save_crop or self.view_img:  # Add bbox to image
                     self.c = int(cls)  # integer class
                     if self.c == 1:
