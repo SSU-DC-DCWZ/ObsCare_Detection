@@ -12,6 +12,8 @@ import torch.backends.cudnn as cudnn
 from DB_video import videoDB
 from DB_log import logDB
 
+import threading
+
 FILE = Path(__file__).absolute()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
@@ -49,6 +51,9 @@ class model:
         self.half=False
         self.running = False
         self.loadModel()
+
+        self.list = []
+        self.count = 0
 
     @torch.no_grad()
 
@@ -118,9 +123,11 @@ class model:
                 cv2.putText(self.im0, showtime.strftime('%Y/%m/%d'), (10,710), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
                 cv2.putText(self.im0, showtime.strftime('%H:%M:%S'), (1200,710), cv2.FONT_HERSHEY_DUPLEX,0.5,(255,255,255))
                 cv2.putText(self.im0, 'CAM' + str(0), (1200,25), cv2.FONT_HERSHEY_DUPLEX,0.7,(255,255,255)) #스트리밍 화면에 시간, 카메라번호 출력
+                
+                if self.c == 1:
+                    self.falldetection()
 
-                # Print time (inference + NMS)
-                if self.c >= 1:
+                if self.c >= 2:
                     self.writeLog(self.s)
                     self.screenshot(self.c)
 
@@ -132,6 +139,22 @@ class model:
             if now.strftime('%H%M%S') == '000000':  # 일단위 저장을 위해 00시 00분 00초가 되면 스트리밍을 멈추고 재시작
                 self.stop()
                 self.start()
+
+    def falldetection(self):
+        now = datetime.datetime.now()
+        self.list.append(now)
+        
+        if len(self.list) >= 2 :
+            time = (self.list[-1] - self.list[0])
+            print(time.total_seconds())
+        else:
+            self.list = []
+      
+        if time.total_seconds() >= 5:
+            print("fall is detected")
+            self.list = []
+            
+        
 
     def writeLog(self, name):
         print(f'time, camNum, {name}')
@@ -187,18 +210,20 @@ class model:
             # Rescale boxes from img_size to im0 size
             det[:, :4] = scale_coords(img.shape[2:], det[:, :4], self.im0.shape).round()
             # Print results
-            for c in det[:, -1].unique():
-                n = (det[:, -1] == c).sum()  # detections per class
-                self.s += f"{n} {self.names[int(c)]}{'s' * (n > 1)}, "  # add to stri   
+            for self.c in det[:, -1].unique():
+                n = (det[:, -1] == self.c).sum()  # detections per class
+                self.s += f"{n} {self.names[int(self.c)]}{'s' * (n > 1)}, "  # add to stri   
             # Write results
             for *xyxy, conf, cls in reversed(det):
-                if self.save_txt:  # Write to file
-                    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                    line = (cls, *xywh, conf) if self.save_conf else (cls, *xywh)  # label format
-                    with open(txt_path + '.txt', 'a') as f:
-                         f.write(('%g ' * len(line)).rstrip() % line + '\n')
+                #if self.save_txt:  # Write to file
+                #    xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
+                #    line = (cls, *xywh, conf) if self.save_conf else (cls, *xywh)  # label format
+                #    with open(txt_path + '.txt', 'a') as f:
+                #         f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                 if self.save_img or self.save_crop or self.view_img:  # Add bbox to image
                     self.c = int(cls)  # integer class
+                    if self.c == 1:
+                        self.count += 1
                     label = None if self.hide_labels else (self.names[self.c] if self.hide_conf else f'{self.names[self.c]} {conf:.2f}')
                     plot_one_box(xyxy, self.im0, label=label, color=colors(self.c, True), line_thickness=self.line_thickness)
