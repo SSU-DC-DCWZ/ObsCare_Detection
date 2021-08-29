@@ -140,13 +140,13 @@ class model:
         self.list.append(now)
         
         if len(self.list) >= 2 :
-            time = int((self.list[-1].total_seconds() - self.list[0].total_seconds()))
+            time = self.list[-1]- self.list[0]
             print(type(time))
 
         else:
-            time = -1
+            time = datetime.datetime(2021, 1, 20, 0 , 0 ,0, 0) #my birthday
             
-        if time == 5: ##연속적 falldetect
+        if time.total_seconds() == 5: ##연속적 falldetect
             print("fall is detected")
             self.list = [] ## 시간 초기화
 
