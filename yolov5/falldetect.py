@@ -144,8 +144,7 @@ class model:
             print(time.total_seconds())
 
         else:
-            time = 0
-            #self.list = [] ?? 이게뭘까
+            self.list = [] 
       
         if time.total_seconds() == 5: ##연속적 falldetect
             print("fall is detected")
