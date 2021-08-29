@@ -208,9 +208,9 @@ class model:
                 self.s += f"{n} {self.names[int(self.c)]}{'s' * (n > 1)}, "  # add to stri   
             # Write results
             for *xyxy, conf, cls in reversed(det):
-                if self.save_img or self.save_crop or self.view_img:  # Add bbox to image
-                    self.c = int(cls)  # integer class
-                    if self.c == 1:
-                        self.count += 1
-                    label = None if self.hide_labels else (self.names[self.c] if self.hide_conf else f'{self.names[self.c]} {conf:.2f}')
-                    plot_one_box(xyxy, self.im0, label=label, color=colors(self.c, True), line_thickness=self.line_thickness)
+                #if self.save_img or self.save_crop or self.view_img:  # Add bbox to image
+                self.c = int(cls)  # integer class
+                if self.c == 1:
+                    self.count += 1
+                label = None if self.hide_labels else (self.names[self.c] if self.hide_conf else f'{self.names[self.c]} {conf:.2f}')
+                plot_one_box(xyxy, self.im0, label=label, color=colors(self.c, True), line_thickness=self.line_thickness)
