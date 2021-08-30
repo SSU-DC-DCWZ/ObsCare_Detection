@@ -18,7 +18,7 @@ FILE = Path(__file__).absolute()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
 from models.experimental import attempt_load
-from utils.datasets import LoadStreams
+from utils.datasets import LoadStreams, LoadWebcam
 from utils.general import check_img_size, check_imshow,non_max_suppression, scale_coords, xyxy2xywh,set_logging, increment_path
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device,time_sync
@@ -76,7 +76,7 @@ class model:
         if self.webcam:
             self.view_img = check_imshow()
             cudnn.benchmark = True  # set True to speed up constant image size inference
-            self.dataset = LoadStreams(self.source, img_size=self.imgsz, stride=self.stride)
+            self.dataset =  LoadStreams(self.source, img_size=self.imgsz, stride=self.stride)
         width = self.dataset.w
         height = self.dataset.h
         fps = self.dataset.fps[0]
@@ -140,13 +140,16 @@ class model:
         self.list.append(now)
         
         if len(self.list) >= 2 :
-            time = self.list[-1]- self.list[0]
-            print(type(time))
+            time = self.list[-1] - self.list[0]
 
         else:
-            time = datetime.datetime(2021, 1, 20, 0 , 0 ,0, 0) #my birthday
-            
-        if time.total_seconds() == 5: ##연속적 falldetect
+            time = datetime.timedelta(0, 0, 0, 0 , 0 ,0, 0) #my birthday
+
+        if int(time.total_seconds()) >= 6:
+            self.list = []
+
+        print(time.total_seconds())
+        if int(time.total_seconds()) >= 5: ##연속적 falldetect
             print("fall is detected")
             self.list = [] ## 시간 초기화
 
