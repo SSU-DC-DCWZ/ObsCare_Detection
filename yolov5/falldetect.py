@@ -20,6 +20,7 @@ sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
 # 본 프로젝트는 YOLOv5 및 deepSORT를 바탕으로 object detection model을 custom train 시킨 모델을 사용합니다.
 # YOLOv5 와 deepSORT의 라이브러리 함수들을 import해 fall detection 및 specific obeject detection 및 alert 에 필요한 parameter를 가져올 수 있게 합니다.
+#mog
 from utils.google_utils import attempt_download
 from models.experimental import attempt_load
 from utils.datasets import LoadStreams, LoadWebcam
