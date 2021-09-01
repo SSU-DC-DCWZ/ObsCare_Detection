@@ -18,14 +18,14 @@ FILE = Path(__file__).absolute()
 sys.path.append(FILE.parents[0].as_posix())  # add yolov5/ to path
 
 
-# models 및 utils 라이브러리는 yolov5에서 제작한 라이브러리입니다. falldetect에서는 이 함수들을 가져와 값을 설정하게 합니다.
+# 본 프로젝트는 YOLOv5 및 deepSORT를 바탕으로 object detection model을 custom train 시킨 모델을 사용합니다.
+# YOLOv5 와 deepSORT의 라이브러리 함수들을 import해 fall detection 및 specific obeject detection 및 alert 에 필요한 parameter를 가져올 수 있게 합니다.
 from utils.google_utils import attempt_download
 from models.experimental import attempt_load
 from utils.datasets import LoadStreams, LoadWebcam
 from utils.general import check_img_size, check_imshow,non_max_suppression, scale_coords, xyxy2xywh,set_logging, increment_path
 from utils.plots import colors, plot_one_box
-from utils.torch_utils import select_device,time_sync
-#deppSORT 적용, 
+from utils.torch_utils import select_device,time_sync 
 from deep_sort_pytorch.utils.parser import get_config
 from deep_sort_pytorch.deep_sort import DeepSort
 
@@ -63,8 +63,8 @@ class model:
         self.half=False
         self.running = False
 
-        self.fallTimeList = []
-        self.objectTimeList = []
+        self.fallTimeList = [] #falltime 시간 측정시 사용되는 리스트
+        self.objectTimeList = [] #objecttime 측정 사물 측정시 사용되는 리스트
 
         self.id = None
         self.fallId = None
@@ -195,7 +195,7 @@ class model:
             if self.objectId == self.id and self.noti == None:
                 print("detected")
                 self.noti = 1
-            #now = datetime.datetime.now()
+            #now = datetime.datetime.now() 
             #self.objectTimeList.append(now)
             #
             #if self.prev is not None:
