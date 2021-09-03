@@ -82,7 +82,7 @@ easydict
 
 본 모델은 COCO dataset을 바탕으로 pre-train된 모델을 전이학습시켰습니다.
 
-![ObsCure_Detection%20d8a88002a03d424f85993afd424ebc3b/result.png](ObsCure_Detection%20d8a88002a03d424f85993afd424ebc3b/result.png)
+![./README/result.png](./README/result.png)
 
 추후 모델개선에 있어서, 필요한 이미지는 클래스당 1500개, 클래스의 인스턴스가 10000개가 될 수 있도록 조정할 예정입니다.
 
@@ -92,7 +92,7 @@ easydict
 
 ---
 
-![ObsCure_Detection%20d8a88002a03d424f85993afd424ebc3b/testgif.gif](ObsCure_Detection%20d8a88002a03d424f85993afd424ebc3b/testgif.gif)
+![./README/testgif.gif](./README/testgif.gif)
 
 ## 기여자
 
