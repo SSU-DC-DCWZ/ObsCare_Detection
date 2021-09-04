@@ -115,6 +115,7 @@ Yolov5_DeepSort_Pytorch
 [GitHub - mikel-brostrom/Yolov5_DeepSort_Pytorch: Real-time multi-object tracker using YOLO v5 and deep sort](https://github.com/mikel-brostrom/Yolov5_DeepSort_Pytorch)
 
 ## License
+#### 이 프로젝트는 [GNU General Public License v3.0](https://github.com/SSU-DC-DCWZ/ObsCure_Detection/blob/main/LICENSE)을 사용합니다.
 
 ---
 
