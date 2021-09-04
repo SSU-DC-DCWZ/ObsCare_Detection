@@ -1,4 +1,4 @@
-# ObsCure_Detection
+# ObsCare_Detection
 ## 소개
 - CCTV 실시간 영상처리에 활용될 영상처리모델 클래스입니다.
 - yolov5 및 deepSORT를 활용하여 웹캠을 소스로 받아와 식별 클래스에 바운딩 박스를 생성하고
@@ -61,4 +61,4 @@ easydict
 **Yolov5_DeepSort_Pytorch**  
 [GitHub - mikel-brostrom/Yolov5_DeepSort_Pytorch: Real-time multi-object tracker using YOLO v5 and deep sort](https://github.com/mikel-brostrom/Yolov5_DeepSort_Pytorch)  
 ## 라이선스
-#### 이 프로젝트는 [GNU General Public License v3.0](https://github.com/SSU-DC-DCWZ/ObsCure_Detection/blob/main/LICENSE)을 사용합니다.
+#### 이 프로젝트는 [GNU General Public License v3.0](https://github.com/SSU-DC-DCWZ/ObsCare_Detection/blob/main/LICENSE)을 사용합니다.
