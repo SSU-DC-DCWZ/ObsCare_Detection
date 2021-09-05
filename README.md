@@ -1,3 +1,4 @@
+
 # ObsCare_Detection
 ## 소개
 - CCTV 실시간 영상처리에 활용될 영상처리모델 클래스입니다.
@@ -23,6 +24,7 @@
 ### 3. DeepSort
 > ##### 본 모델의 식별에 있어 각 바운딩 박스별 고유의 ID를 부여하기 위해 DeepSort를 적용했습니다.
 - DeepSort를 통해 Object Tracking 및 박스별 ID를 통해 동시다발적 상황처리를 유연하게 처리할 수 있도록 했습니다.
+https://drive.google.com/file/d/1ENyNxEmXgTz7lfkFEzeZqNvu-jW-5jAt/view?usp=sharing
 ## Requirement
 ```python
 # base ----------------------------------------
