@@ -43,13 +43,20 @@ pandas
 easydict
 ```
 ## 학습결과
-- 초기 모델 제작시 총 550 개의 이미지를 사용했으며 mAP_0.5는  0.8정도입니다.
+- 모델 제작시 총 1500 장의 이미지를 사용했으며 mAP_0.5는 0.8이상입니다.
+
+    (클래스 인스턴스의 총합 : 약 3500)
 - 본 모델은 COCO dataset을 바탕으로 pre-train된 모델을 전이학습시켰습니다.
-![./README/result.png](./README/result.png)
-- 추후 모델개선에 있어서, 필요한 이미지는 클래스당 1500개, 클래스의 인스턴스가 10000개가 될 수 있도록 조정할 예정입니다.
-- 초기모델의 경우 가장 리소스를 많이 사용하는 YOLOv5x를 사용했습니다. 추후 프로그램에 환경에 따라 모델의 크기를 m이나 l로 조정할 수 있습니다.
+
+![./README/results.png](./README/results.png)
+
+- 최종 모델은 YOLOv5m.pt모델을 전이 학습시켜 약 300의 epoch을 진행시켰으나, 80에서 Early stop되었습니다. 
+-총 4개의 웹캠을 동시에 처리하기 위해 리소스 사용량을 줄인 모델을 사용했습니다.
+
 ## 예시
 ![./README/testgif.gif](./README/testgif.gif)
+
+![./README/falldetect.png](./README/falldetect.png)
 ## 기여자
 **강병휘(essentialhrdy) : 모델 학습 및 Object Detection 처리**  
 
