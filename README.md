@@ -57,6 +57,11 @@ easydict
 ![./README/testgif.gif](./README/testgif.gif)
 
 ![./README/falldetect.png](./README/falldetect.png)
+
+- 본 프로그램은 모델을 활용한 ObsCure의 모습입니다.
+
+## Link : [ObsCure](https://github.com/SSU-DC-DCWZ/ObsCare_Main)
+
 ## 기여자
 **강병휘(essentialhrdy) : 모델 학습 및 Object Detection 처리**  
 
