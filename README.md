@@ -69,6 +69,7 @@ MODEL DOWNLOAD : https://drive.google.com/file/d/1ENyNxEmXgTz7lfkFEzeZqNvu-jW-5j
 
 ## 기여자
 **강병휘(essentialhrdy) : 모델 학습 및 Object Detection 처리**  
+
 **이찬서(Lfollow-CS) : DB,Stream 관리 및 개별 프로젝트 통합**  
 
 ## BASE
