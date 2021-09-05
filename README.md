@@ -55,6 +55,8 @@ easydict
 - 최종 모델은 YOLOv5m.pt모델을 전이 학습시켜 약 300의 epoch을 진행시켰으나, 80에서 Early stop되었습니다. 
 -총 4개의 웹캠을 동시에 처리하기 위해 리소스 사용량을 줄인 모델을 사용했습니다.
 
+MODEL DOWNLOAD : https://drive.google.com/file/d/1ENyNxEmXgTz7lfkFEzeZqNvu-jW-5jAt/view?usp=sharing
+
 ## 예시
 ![./README/testgif.gif](./README/testgif.gif)
 
